@@ -105,11 +105,11 @@ and Board () =
           |> List.choose snd
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
   // Metode der returnerer alle brikker i spil på brættet.
-  member this.piecesOnBoard : (chessPiece array) = 
-    let mutable piecesArray : chessPiece array = [||]
+  member this.piecesOnBoard = 
+    let mutable piecesList = []
     for i = 0 to 7 do
       for j = 0 to 7 do
         match (_array.[i,j]) with
-        | Some x -> (Array.append piecesArray [|x|])
-        | None -> piecesArray //den opdaterer sig selv med sig selv fordi der ikke skal ske noget
-    piecesArray
+        | Some x -> (piecesList <- x :: piecesList)
+        | None -> () //den opdaterer sig selv med sig selv fordi der ikke skal ske noget
+    piecesList

@@ -20,7 +20,8 @@ type chessPiece(color : Color) =
   /// at hand.      
   abstract member candiateRelativeMoves : Position list list
   /// Available moves and neighbours ([(1,0); (2,0);...], [p1; p2])
-  member this.availableMoves (board : Board) : (Position list * chessPiece list) =
+  abstract member availableMoves : Board -> (Position list * chessPiece list)
+  default this.availableMoves (board : Board) : (Position list * chessPiece list) =
     board.getVacantNNeighbours this (*//§\label{chessPieceEnd}§*)
 /// A board §\label{chessBoardBegin}§
 and Board () =
@@ -105,9 +106,10 @@ and Board () =
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
   // Metode der returnerer alle brikker i spil på brættet.
   member this.piecesOnBoard : (chessPiece array) = 
-    let mutable piecesArray : (chessPiece array) = [||]
+    let mutable piecesArray : chessPiece array = [||]
     for i = 0 to 7 do
       for j = 0 to 7 do
-        match _array.[i,j] with
+        match (_array.[i,j]) with
         | Some x -> (Array.append piecesArray [|x|])
+        | None -> piecesArray //den opdaterer sig selv med sig selv fordi der ikke skal ske noget
     piecesArray

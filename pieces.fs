@@ -13,12 +13,12 @@ type king(col : Color) =
     // Gemmer de mulige moves for kongen
     let moves : (Position list * chessPiece list) = board.getVacantNNeighbours this
     // Henter alle brikker på brættet
-    let piecesArray : (chessPiece array) = board.piecesOnBoard
+    let piecesList = board.piecesOnBoard
     // Filtrerer modstanderbrikkerne ud i et array
-    let opponentPiecesList = piecesArray |> Array.filter (fun x -> (this.color <> x.color))
+    let opponentPiecesList = piecesList |> List.filter (fun x -> (this.color <> x.color))
     // Nu finder vi alle modstanderbrikkernes mulige moves, og disse vil vi
     // tilføje til et array af modstandermoves
-    let opponentMovesList = [] // tom liste til modstander moves
+    let mutable opponentMovesList = [] // tom liste til modstander moves
     for i = 0 to opponentPiecesList.Length - 1 do
       //finder modstander moves
       let tuppel = board.getVacantNNeighbours (opponentPiecesList.[i])
@@ -27,11 +27,11 @@ type king(col : Color) =
       let tuppelnew = snd(tuppel) |> List.map (fun x -> match x.position with Some x -> x)
       // ovenstående position er en Position option, så vi konverterer til Position i den anonyme funktion
       //tilføjer modstander moves til listen
-      List.append opponentMovesList (List.append (fst(tuppel)) tuppelnew)
+      opponentMovesList <- List.append opponentMovesList (List.append (fst(tuppel)) tuppelnew)
 
     // Nu tjekker vi kongens moves op imod modstandermoves og fjerner dem, der overlapper
     let availableMovesFinal = List.filter (fun (x : Position) -> not (List.contains x opponentMovesList)) (fst(moves))
-    (availableMovesFinal,[])
+    (availableMovesFinal,(snd(moves)))
 
 /// A rook is a chessPiece which moves horisontally and vertically
 type rook(col : Color) =

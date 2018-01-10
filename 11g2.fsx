@@ -1,3 +1,5 @@
+module Players
+type Color = White | Black
 open Chess
 open Pieces
 open System
@@ -9,8 +11,9 @@ open System
  *  nødt til at implementere.
  *)
 [<AbstractClass>]
-type Player() = 
-    abstract member nextMove : unit -> string
+type Player(color : Color) =
+    member this.color = color // White, Black
+    abstract member nextMove : Board -> string
 
 (*
  *  Det her er en af de nedarvede klasser, der spørger
@@ -19,9 +22,9 @@ type Player() =
  *  spørges igen. Til sidst retuneres enten trækket 
  *  eller quit.
  *)
-type Human() =
-    inherit Player()
-    override this.nextMove() =
+type Human(color : Color) =
+    inherit Player(color)
+    override this.nextMove(board : Board) =
         // boolean flag der medvirker at den bliver ved med at spørge
         let mutable invalidMove = true
         let mutable playerMove = ""
@@ -29,24 +32,118 @@ type Human() =
             printfn "Hvor vil du rykke fra/til?"
             playerMove <- System.Console.ReadLine() //gemmer input
             if playerMove = "quit" then
-                invalidMove <- false //exit game/der sker ikke noget
-            elif (playerMove.Length) = 5 then //input har korrekt længde
-                let pieceToMove = playerMove.[0..1] //udtrækker brikken, der skal flyttes
-                //check om der er en brik på dette felt
-                // hvis ikke, så spørg igen om en codestring
-                // hvilken brik er det?
-                let targetSquare = playerMove.[3..4] //udtrækker feltet, der skal flyttes til
-                // check om det er et gyldigt træk for den givne brik
-                // hvis ikke, så spørg igen om en codestring
-                // ellers returner det og ændr invalidMove.
-                printfn "success! %A %A " pieceToMove targetSquare
-                invalidMove <- false
+                invalidMove <- false //exit game/gyldigt input
+            //Tjekker om input har korrekt længde og indeholder et mellemrum det rigtige sted
+            elif ((playerMove.Length) = 5) && ( (int) playerMove.[2] = 32) then 
+                // Caster bogstaver til tal der passer til brættet. 
+                // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
+                let firstArg = (int) playerMove.[0] - 97
+                let secondArg = (int) playerMove.[1] - 48
+                let thirdArg = (int) playerMove.[3] - 97
+                let fourthArg = (int) playerMove.[4] - 48
+                //Putter brikken der skal flyttes i en tuppel
+                let pieceToMove = (firstArg, secondArg)
+                //Putter destinatonsfeltet (targetSquare) i en tuppel
+                let targetSquare = (thirdArg, fourthArg)
+
+                //Tjekker om der er en af spillerens egne brikker på feltet pieceToMove
+                let availablePieces = board.piecesOnBoard |> List.filter (fun x -> (this.color = x.color))
+                // Brikkernes positioner pakkes ud fra option type
+                let pos = List.map (fun (x : chessPiece) -> match x.position with Some x -> x) availablePieces
+
+                //Tjekker om targetSquare er et gyldigt træk.   
+                // Finder brikken, der skal flyttes
+                let chosenPiece = List.find (fun (x : chessPiece) -> Some pieceToMove = x.position) availablePieces
+                // Finder brikkens mulige træk.
+                // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
+                // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
+                let positions = fst(chosenPiece.availableMoves(board)) //udtrækker positioner
+                let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker chessPieces
+                let chessPiecePos = List.map (fun (x : chessPiece) -> match x.position with Some x -> x) chessPieces //udpakker option type
+                let allPositions = List.append positions chessPiecePos //sætter positionerne og positionerne på chessPieces sammen i én liste
+                
+                //Indeholder disse (allPositions) targetSquare?
+                let targetSquareValid = List.contains targetSquare allPositions
+
+                // Hvis pieceToMove matcher med en af brikkernes position OG hvis 
+                // targetSquare er et gyldigt træk for den givne brik, så er det 
+                // en gyldig codestring
+                if (List.contains pieceToMove pos) && (targetSquareValid) then
+                    invalidMove <- false
         playerMove
+(*
+ *  Det her er en af de nedarvede klasser, der laver en
+ *  codestring tilfældigt. Den vælger en vilkårlig brik og
+ *  vælger dernæst et vilkårligt træk fra dens liste af
+ *  mulige træk.
+ *)
+type Computer(color : Color) = 
+    inherit Player(color)
+    override this.nextMove (board : Board) =
+        //Henter alle egne brikker på brættet
+        let piecesList = board.piecesOnBoard |> List.filter (fun x -> (this.color = x.color))
+        // Vælger en vilkårlig brik
+        // Genererer et tilfældigt tal
+        let gen = System.Random()
+        let x = gen.Next(0, piecesList.Length) // indtil sidste indeks i listen
+        let chosenPiece = piecesList.[x]
+        let chosenCoors = match chosenPiece.position with | Some x -> x
 
-type Computer() = 
-    inherit Player()
-    override this.nextMove () =
-        "not-yet-implemented"
+        // Finder brikkens mulige træk.
+        // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
+        // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
+        let positions = fst(chosenPiece.availableMoves(board)) //udtrækker positioner
+        let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker chessPieces
+        let chessPiecePos = List.map (fun (x : chessPiece) -> match x.position with Some x -> x) chessPieces //udpakker option type
+        let allPositions = List.append positions chessPiecePos //sætter positionerne og positionerne på chessPieces sammen i én liste
+        
+        //vælger vilkårligt en position
+        let randomIndex = gen.Next(0, allPositions.Length) // indtil sidste indeks i arrayet
+        let randomPos = allPositions.[randomIndex]
+        //Laver codestring som en string
+        let mutable codestring = ""
+        // Caster positionerne til strings
+        let a = (string) (fst(chosenCoors))
+        let b = (string) (snd(chosenCoors))
+        let c = (string) (fst(randomPos))
+        let d = (string) (snd(randomPos))
+        // tilføjer alle positioner til codestring
+        codestring <-String.concat "" [a; b; " "; c; d]
 
-let spiller1 = new Human()
-spiller1.nextMove()
+        codestring
+
+
+
+// Test:
+/// Print various information about a piece
+let printPiece (board : Board) (p : chessPiece) : unit =
+  printfn "%A: %A %A" p p.position (p.availableMoves board)
+
+// Create a game
+let board = Chess.Board () // Create a board
+// Pieces are kept in an array for easy testing
+let pieces = [|
+  king (White) :> chessPiece;
+  rook (White) :> chessPiece;
+  king (Black) :> chessPiece |]
+// Place pieces on the board
+board.[0,0] <- Some pieces.[0]
+board.[1,1] <- Some pieces.[1]
+board.[4,1] <- Some pieces.[2]
+printfn "%A" board
+Array.iter (printPiece board) pieces
+
+// Make moves
+board.move (1,1) (3,1) // Moves a piece from (1,1) to (3,1)
+printfn "%A" board
+Array.iter (printPiece board) pieces
+
+
+// Test af at Human fungerer
+let spiller1 = new Human(Black)
+spiller1.nextMove(board)
+
+// Test af at Computer fungerer
+// Den printer ikke noget på konsollen.. den genererer bare en codestring.
+let spiller2 = new Computer(White)
+spiller2.nextMove(board)

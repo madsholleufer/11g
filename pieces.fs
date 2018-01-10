@@ -14,7 +14,7 @@ type king(col : Color) =
     let moves : (Position list * chessPiece list) = board.getVacantNNeighbours this
     // Henter alle brikker på brættet
     let piecesList = board.piecesOnBoard
-    // Filtrerer modstanderbrikkerne ud i et array
+    // Filtrerer modstanderbrikkerne ud i en liste
     let opponentPiecesList = piecesList |> List.filter (fun x -> (this.color <> x.color))
     // Nu finder vi alle modstanderbrikkernes mulige moves, og disse vil vi
     // tilføje til et array af modstandermoves

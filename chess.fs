@@ -105,7 +105,7 @@ and Board () =
           |> List.choose snd
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
   // Metode der returnerer alle brikker i spil på brættet.
-  member this.piecesOnBoard = 
+  member this.piecesOnBoard() : chessPiece list= 
     let mutable piecesList = []
     for i = 0 to 7 do
       for j = 0 to 7 do

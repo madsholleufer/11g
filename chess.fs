@@ -1,6 +1,7 @@
 module Chess (*//§\label{chessHeader}§*)
 type Color = White | Black
 type Position = int * int(*//§\label{chessTypeEnd}§*)
+
 /// An abstract chess piece §\label{chessPieceBegin}§
 [<AbstractClass>]
 type chessPiece(color : Color) =
@@ -104,6 +105,7 @@ and Board () =
           vacantPieceLists
           |> List.choose snd
         (vacant, opponent)(*//§\label{chessBoardEnd}§*)
+
   // Metode der returnerer alle brikker i spil på brættet.
   member this.piecesOnBoard() : chessPiece list= 
     let mutable piecesList = []

@@ -1,5 +1,17 @@
 module Pieces
 open Chess
+
+(*
+ * Definerer en metode, der pakker en option type ud.
+ * Metoden bruges mest til at udtrække koordinaterne 
+ * på positionen af en skakbrik.
+ * Eksempel: Some (1,3) udpakkes til (1,3).
+ *)
+let optionHelp (lst : chessPiece list) : Position list =
+   let pieces = List.map (fun (x : chessPiece) -> x.position) lst
+   let positions = (pieces |> List.choose id) // vælger elementer ud som "har et id", dvs er "Some p"
+   positions
+
 /// A king is a chessPiece which moves 1 square in any direction
 type king(col : Color) =
   inherit chessPiece(col)
@@ -22,15 +34,18 @@ type king(col : Color) =
     for i = 0 to opponentPiecesList.Length - 1 do
       //finder modstander moves
       let tuppel = board.getVacantNNeighbours (opponentPiecesList.[i])
-      // Udtrækker positionen på brikker der gemmes som navnet på brikken
+      // Udtrækker positionen på brikker der gemmes som en chessPiece
       // på pladsen snd i tuplen.
-      let tuppelnew = snd(tuppel) |> List.map (fun (x : chessPiece) -> match x.position with Some x -> x)
-      // ovenstående position er en Position option, så vi konverterer til Position i den anonyme funktion
-      //tilføjer modstander moves til listen
-      opponentMovesList <- List.append opponentMovesList (List.append (fst(tuppel)) tuppelnew)
+      let optionValues = optionHelp(snd(tuppel))
+      // ovenstående position er en Position option, 
+      // så vi bruger en hjælpefunktion til at udpakke værdierne
+
+      // Tilføjer modstander moves til listen
+      opponentMovesList <- List.append opponentMovesList (List.append (fst(tuppel)) optionValues)
 
     // Nu tjekker vi kongens moves op imod modstandermoves og fjerner dem, der overlapper
     let availableMovesFinal = List.filter (fun (x : Position) -> not (List.contains x opponentMovesList)) (fst(moves))
+    //Returnerer de resterende moves
     (availableMovesFinal,(snd(moves)))
 
 /// A rook is a chessPiece which moves horisontally and vertically
@@ -55,14 +70,3 @@ type rook(col : Color) =
   override this.candiateRelativeMoves =
     List.map (swap List.map [1..7]) indToRel (*//§\label{chessPieceSwapApp}§*)
   override this.nameOfType = "rook"
-
-(*
- * Definerer en metode, der pakker en option type ud.
- * Metoden bruges mest til at udtrække koordinaterne 
- * på positionen af en skakbrik.
- * Eksempel: Some (1,3) udpakkes til (1,3).
- *)
- let optionHelp (lst : chessPiece list) : Position list =
-    let pieces = List.map (fun (x : chessPiece) -> x.position) lst
-    let positions = (pieces |> List.choose id) // vælger elementer ud som "har et id", dvs er "Some p"
-    positions

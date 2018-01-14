@@ -15,7 +15,7 @@ let pieces = [|
 board.[0,0] <- Some pieces.[0]
 board.[1,1] <- Some pieces.[1]
 board.[4,1] <- Some pieces.[2]
-printfn "%A" board
+printfn "%A" boards
 Array.iter (printPiece board) pieces
 
 // Make moves

@@ -115,3 +115,14 @@ and Board () =
         | Some x -> (piecesList <- x :: piecesList)
         | None -> () //den opdaterer sig selv med sig selv fordi der ikke skal ske noget
     piecesList
+  
+  // Metoder der printer brættet og info om brikkerne
+  /// Printer info om en brik (ledige træk, osv)
+  member this.printPiece (board : Board) (p : chessPiece) : unit =
+    printfn "%A: %A %A" p p.position (p.availableMoves board)
+  //Printer brættet og info om brikkerne
+  member this.printBoard (board : Board) (pieces : chessPiece array) =
+    //Printer brættet
+    printfn "%A" board
+    //Printer info om brikkerne
+    Array.iter (this.printPiece board) pieces

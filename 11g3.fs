@@ -24,68 +24,77 @@ type Game(playerOne : Player, playerTwo : Player) =
      *  en computer, udføres dens træk og turen går 
      *  tilbage til spiller 1.
      *)
-    member this.run(board : Board) =
+    member this.run(board : Board, pieces : chessPiece array) =
         let mutable gameplay = true
-        let mutable codestring = ""
+        let mutable codestring1 = "" //codestring for spiller 1
+        let mutable codestring2 = "" //codestring for spiller 2
+        // Printer brættet
+        board.printBoard board pieces
         while (gameplay) do
             // Spiller 1s tur
             // Henter spillerens input og gemmer i codestring variablen
-            codestring <- this.playerOne.nextMove(board)
+            codestring1 <- this.playerOne.nextMove(board)
             // Vil spilleren stoppe med at spille?
-            if codestring = "quit" then
-                printfn "player 1 quit!!"
+            if codestring1 = "quit" then
+                printfn "GAME OVER. \nSpiller 1 har forladt spillet!"
                 gameplay <- false
             else 
                 // Konverterer codestring til en Position
                 // Caster char tal til integers (der passer til brættet). 
                 // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                let firstArg = (int) codestring.[0] - 97
-                let secondArg = (int) codestring.[1] - 48
-                let thirdArg = (int) codestring.[3] - 97
-                let fourthArg = (int) codestring.[4] - 48
+                let firstArg = (int) codestring1.[0] - 97
+                let secondArg = (int) codestring1.[1] - 48
+                let thirdArg = (int) codestring1.[3] - 97
+                let fourthArg = (int) codestring1.[4] - 48
                 //Putter brikken der skal flyttes i en tuppel
                 let source = (firstArg, secondArg)
                 //Putter destinatonsfeltet (targetSquare) i en tuppel
                 let target = (thirdArg, fourthArg)
                 board.move source target
-                printfn "succes player 1!!"
+                printfn "Spiller 1 har flyttet sin brik fra %A til %A.\n" source target
+                // Printer brættet med den flyttede brik
+                board.printBoard board pieces
 
             // Spiller 2s tur
-            // Hvis spilleren er Human
-            if (this.playerTwo :? Human && codestring <> "quit") then
-                codestring <- this.playerTwo.nextMove(board)
+            // Hvis spilleren er Human og den første spiller ikke har skrevet quit
+            if (this.playerTwo :? Human && codestring1 <> "quit") then
+                codestring2 <- this.playerTwo.nextMove(board)
                 // Vil spilleren stoppe med at spille?
-                if codestring = "quit" then
-                    printfn "player 2 quit!!"
+                if codestring2 = "quit" then
+                    printfn "GAME OVER. \nSpiller 2 har forladt spillet!"
                     gameplay <- false
                 else 
                     // Konverterer codestring til en Position
                     // Caster char tal til integers (der passer til brættet). 
                     // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                    let firstArg = (int) codestring.[0] - 97
-                    let secondArg = (int) codestring.[1] - 48
-                    let thirdArg = (int) codestring.[3] - 97
-                    let fourthArg = (int) codestring.[4] - 48
+                    let firstArg = (int) codestring2.[0] - 97
+                    let secondArg = (int) codestring2.[1] - 48
+                    let thirdArg = (int) codestring2.[3] - 97
+                    let fourthArg = (int) codestring2.[4] - 48
                     //Putter brikken der skal flyttes i en tuppel
-                    let source1 = (firstArg, secondArg)
+                    let source2 = (firstArg, secondArg)
                     //Putter destinatonsfeltet (targetSquare) i en tuppel
-                    let target1 = (thirdArg, fourthArg)
-                    board.move source1 target1
-                    printfn "succes player 2 human!!"
+                    let target2 = (thirdArg, fourthArg)
+                    board.move source2 target2
+                    printfn "Spiller 2 har flyttet sin brik fra %A til %A.\n" source2 target2
+                    // Printer brættet med den flyttede brik
+                    board.printBoard board pieces
                     
             //Hvis spilleren er Computer
-            elif (this.playerTwo :? Computer && codestring <> "quit") then
-                codestring <- this.playerTwo.nextMove(board)
+            elif (this.playerTwo :? Computer && codestring1 <> "quit") then
+                codestring2 <- this.playerTwo.nextMove(board)
                 // Konverterer codestring til en Position
                 // Caster char tal til integers (der passer til brættet). 
                 // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                let firstArg = (int) codestring.[0] - 48
-                let secondArg = (int) codestring.[1] - 48
-                let thirdArg = (int) codestring.[3] - 48
-                let fourthArg = (int) codestring.[4] - 48
+                let firstArg = (int) codestring2.[0] - 48
+                let secondArg = (int) codestring2.[1] - 48
+                let thirdArg = (int) codestring2.[3] - 48
+                let fourthArg = (int) codestring2.[4] - 48
                 //Putter brikken der skal flyttes i en tuppel
-                let source = (firstArg, secondArg)
+                let source2 = (firstArg, secondArg)
                 //Putter destinatonsfeltet (targetSquare) i en tuppel
-                let target = (thirdArg, fourthArg)
-                board.move source target
-                printfn "succes player 2 computer!!"
+                let target2 = (thirdArg, fourthArg)
+                board.move source2 target2
+                printfn "Computeren har flyttet sin brik...\n"
+                // Printer brættet med den flyttede brik
+                board.printBoard board pieces

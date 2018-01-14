@@ -12,7 +12,7 @@ open Pieces
 type Player(color : Color) =
     member this.color = color // White, Black
     member this.getColor() = color
-    // Hvis man har farven sort er man spiller 1 og så starter man
+    // Hvis man har farven sort er man spiller 1 og så starter man,
     // ellers er man spiller 2 og har farven hvid.
     member this.playerNumber = if this.color = Black then 1 else 2
     abstract member nextMove : Board -> string

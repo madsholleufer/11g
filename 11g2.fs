@@ -14,7 +14,7 @@ type Player(color : Color) =
     member this.getColor() = color
     // Hvis man har farven sort er man spiller 1 og så starter man,
     // ellers er man spiller 2 og har farven hvid.
-    member this.playerNumber = if this.color = Black then 1 else 2
+    member this.playerNumber = if this.color = Black then 1 else 2 //bruges til at vise hvis tur det er
     abstract member nextMove : Board -> string
 
 (*
@@ -117,22 +117,3 @@ type Computer(color : Color) =
         codestring <-String.concat "" [a; b; " "; c; d]
 
         codestring
-
-(*
- *  Dette er en af de nedarvede klasser, der simulerer alle
- *  mulige serier af træk mindst n >= 0 ture forud eller
- *  indtil en konge bliver ramt.
- *  Hver serie har en "fitness", som er summen af fitness/
- *  værdien af hvert træk i serien. AI vælger sit træk ved
- *  at vælge trækket i begyndelsen af serien, der har den 
- *  største fitness.
- *  Hvis flere serier har ens fitness, vælges tilfældigt
- *  imellem dem.
- *)
-
-(*
-type AI(color : Color) = 
-    inherit Player(color)
-    override this.nextMove (board : Board) =
-
-*)

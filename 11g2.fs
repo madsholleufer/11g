@@ -18,16 +18,16 @@ type Player(color : Color) =
     abstract member nextMove : Board -> string
 
 (*
- *  Det her er en af de nedarvede klasser, der spørger
+ *  Dette er en af de nedarvede klasser, der spørger
  *  spilleren om hvilken brik de vil rykke og hvorhen. 
- *  Dette er enten "quit" eller et gyldigt træk, ellers
- *  spørges igen. Til sidst retuneres enten trækket 
+ *  Gyldigt input er enten "quit" eller et gyldigt træk,
+ *  ellers spørges igen. Til sidst retuneres enten trækket 
  *  eller quit.
  *)
 type Human(color : Color) =
     inherit Player(color)
     override this.nextMove(board : Board) =
-        // boolean flag der medvirker at den bliver ved med at spørge
+        // boolean flag der medvirker at den bliver ved med at spørge indtil der vælges en gyldig codestring
         let mutable invalidMove = true
         let mutable playerMove = ""
         while (invalidMove) do
@@ -54,27 +54,29 @@ type Human(color : Color) =
                 let pos = optionHelp(availablePieces)
 
                 //Tjekker om targetSquare er et gyldigt træk.   
-                // Finder brikken, der skal flyttes
-                let chosenPiece = List.find (fun (x : chessPiece) -> Some pieceToMove = x.position) availablePieces
-                // Finder brikkens mulige træk.
-                // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
-                // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
-                let positions = fst(chosenPiece.availableMoves(board)) //udtrækker liste af positioner
-                let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker liste af chessPieces
-                let chessPiecePos = optionHelp(chessPieces) //udpakker chessPieces fra option type vha hjælpefunktion
-                let allPositions = List.append positions chessPiecePos //kombinerer positionerne i én liste
-                
-                //Indeholder disse (allPositions) targetSquare?
-                let targetSquareValid = List.contains targetSquare allPositions
+                // Finder brikken, der skal flyttes. Vi bruger tryFind in case den indtastede brik ikke eksisterer.
+                let optionChosenPiece = List.tryFind (fun (x : chessPiece) -> Some pieceToMove = x.position) availablePieces
+                if optionChosenPiece.IsSome then
+                    let chosenPiece = Option.get optionChosenPiece
+                    // Finder brikkens mulige træk.
+                    // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
+                    // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
+                    let positions = fst(chosenPiece.availableMoves(board)) //udtrækker liste af positioner
+                    let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker liste af chessPieces
+                    let chessPiecePos = optionHelp(chessPieces) //udpakker chessPieces fra option type vha hjælpefunktion
+                    let allPositions = List.append positions chessPiecePos //kombinerer positionerne i én liste
+                    
+                    //Indeholder disse (allPositions) targetSquare?
+                    let targetSquareValid = List.contains targetSquare allPositions
 
-                // Hvis pieceToMove matcher med en af brikkernes position OG hvis 
-                // targetSquare er et gyldigt træk for den givne brik, så er det 
-                // en gyldig codestring
-                if (List.contains pieceToMove pos) && (targetSquareValid) then
-                    invalidMove <- false
+                    // Hvis pieceToMove matcher med en af brikkernes position OG hvis 
+                    // targetSquare er et gyldigt træk for den givne brik, så er det 
+                    // en gyldig codestring
+                    if (List.contains pieceToMove pos) && (targetSquareValid) then
+                        invalidMove <- false
         playerMove
 (*
- *  Det her er en af de nedarvede klasser, der laver en
+ *  Dette er en af de nedarvede klasser, der laver en
  *  codestring tilfældigt. Den vælger en vilkårlig brik og
  *  vælger dernæst et vilkårligt træk fra dens liste af
  *  mulige træk.
@@ -115,3 +117,22 @@ type Computer(color : Color) =
         codestring <-String.concat "" [a; b; " "; c; d]
 
         codestring
+
+(*
+ *  Dette er en af de nedarvede klasser, der simulerer alle
+ *  mulige serier af træk mindst n >= 0 ture forud eller
+ *  indtil en konge bliver ramt.
+ *  Hver serie har en "fitness", som er summen af fitness/
+ *  værdien af hvert træk i serien. AI vælger sit træk ved
+ *  at vælge trækket i begyndelsen af serien, der har den 
+ *  største fitness.
+ *  Hvis flere serier har ens fitness, vælges tilfældigt
+ *  imellem dem.
+ *)
+
+(*
+type AI(color : Color) = 
+    inherit Player(color)
+    override this.nextMove (board : Board) =
+
+*)

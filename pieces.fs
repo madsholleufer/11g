@@ -2,10 +2,10 @@ module Pieces
 open Chess
 
 (*
- * Definerer en metode, der pakker en option type ud.
- * Metoden bruges mest til at udtrække koordinaterne 
- * på positionen af en skakbrik.
- * Eksempel: Some (1,3) udpakkes til (1,3).
+ * Definerer en metode, der tager en liste af skakbrikker
+ * som input og pakker hver briks position ud af dens 
+ * option type. På denne måde får vi udtrukket brikkernes 
+ * positionener.
  *)
 let optionHelp (lst : chessPiece list) : Position list =
    let pieces = List.map (fun (x : chessPiece) -> x.position) lst

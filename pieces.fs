@@ -28,25 +28,21 @@ type king(col : Color) =
     let piecesList = board.piecesOnBoard()
     // Filtrerer modstanderbrikkerne ud i en liste
     let opponentPiecesList = piecesList |> List.filter (fun (x : chessPiece) -> (this.color <> x.color))
-    // Nu finder vi alle modstanderbrikkernes mulige moves, og disse vil vi
-    // tilføje til et array af modstandermoves
-    let mutable opponentMovesList = [] // tom liste til modstander moves
-    for i = 0 to opponentPiecesList.Length - 1 do
-      //finder modstander moves
-      let tuppel = board.getVacantNNeighbours (opponentPiecesList.[i])
-      // Udtrækker positionen på brikker der gemmes som en chessPiece
-      // på pladsen snd i tuplen.
-      let optionValues = optionHelp(snd(tuppel))
-      // ovenstående position er en Position option, 
-      // så vi bruger en hjælpefunktion til at udpakke værdierne
+    //Nu laver vi en liste af tupler med deres available moves
+    let opponentAvailableMoves = List.map (fun x -> board.getVacantNNeighbours x) (opponentPiecesList)
+    //Udtrækker positionerne
+    let opponentAvailablePositions = List.map (fun x -> fst(x)) opponentAvailableMoves
+    //Samler til én position list i stedet for en Position list list
+    let opPos1 = List.concat opponentAvailablePositions
+    //Udtrækker brikkerne
+    let opponentPiecesToKill = List.map (fun x -> snd(x)) opponentAvailableMoves
+    //Samler til én chessPiece list i stedet for en chessPiece list list
+    let opPos2 = List.concat opponentPiecesToKill
 
-      // Tilføjer modstander moves til listen
-      opponentMovesList <- List.append opponentMovesList (List.append (fst(tuppel)) optionValues)
-
-    // Nu tjekker vi kongens moves op imod modstandermoves og fjerner dem, der overlapper
-    let availableMovesFinal = List.filter (fun (x : Position) -> not (List.contains x opponentMovesList)) (fst(moves))
-    //Returnerer de resterende moves
-    (availableMovesFinal,(snd(moves)))
+    // Nu tjekker vi kongens moves op imod modstandermoves og tager dem ud, der IKKE overlapper
+    let a = List.filter (fun (x : Position) -> not (List.contains x opPos1)) (fst(moves))
+    let b = List.filter (fun (x : chessPiece) -> not (List.contains x opPos2)) (snd(moves))
+    (a,b)
 
 /// A rook is a chessPiece which moves horisontally and vertically
 type rook(col : Color) =

@@ -20,7 +20,8 @@ type king(col : Color) =
   override this.candiateRelativeMoves =
       [[(-1,0)];[(-1,1)];[(0,1)];[(1,1)];
       [(1,0)];[(1,-1)];[(0,-1)];[(-1,-1)]]
-  // Ændrer i implementationen af availableMoves
+      
+  // Vores implementation af availableMoves
   override this.availableMoves (board : Board) : (Position list * chessPiece list) = 
     // Gemmer de mulige moves for kongen
     let moves : (Position list * chessPiece list) = board.getVacantNNeighbours this
@@ -38,8 +39,12 @@ type king(col : Color) =
     let opponentPiecesToKill = List.map (fun x -> snd(x)) opponentAvailableMoves
     //Samler til én chessPiece list i stedet for en chessPiece list list
     let opPos2 = List.concat opponentPiecesToKill
-
-    // Nu tjekker vi kongens moves op imod modstandermoves og tager dem ud, der IKKE overlapper
+    (*
+    * Nu tjekker vi kongens moves op imod modstanderens
+    * moves og tager dem ud, der IKKE overlapper.
+    * Dvs. vi filtrerer kongens moves fra, som overlapper 
+    * med modstanderens moves.
+    *)
     let a = List.filter (fun (x : Position) -> not (List.contains x opPos1)) (fst(moves))
     let b = List.filter (fun (x : chessPiece) -> not (List.contains x opPos2)) (snd(moves))
     (a,b)
@@ -47,13 +52,15 @@ type king(col : Color) =
 /// A rook is a chessPiece which moves horisontally and vertically
 type rook(col : Color) =
   inherit chessPiece(col)
-  // rook can move horisontally and vertically
-  // Make a list of relative coordinate lists. We consider the
-  // current position and try all combinations of relative moves
-  // (1,0); (2,0) ... (7,0); (-1,0); (-2,0); ...; (0,-7).
-  // Some will be out of board, but will be assumed removed as
-  // illegal moves.
-  // A list of functions for relative moves
+  (*
+   * rook can move horisontally and vertically
+   * Make a list of relative coordinate lists. We consider the
+   * current position and try all combinations of relative moves
+   * (1,0); (2,0) ... (7,0); (-1,0); (-2,0); ...; (0,-7).
+   * Some will be out of board, but will be assumed removed as
+   * illegal moves.
+   * A list of functions for relative moves
+  *)
   let indToRel = [
     fun elm -> (elm,0); // South by elm
     fun elm -> (-elm,0); // North by elm

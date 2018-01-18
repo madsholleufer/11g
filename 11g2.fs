@@ -3,6 +3,17 @@ open Chess
 open Pieces
 
 (*
+ * Definerer en funktion, der tager en liste af skakbrikker
+ * som input og pakker hver briks position ud af dens 
+ * option type. På denne måde får vi udtrukket brikkernes 
+ * positioner.
+ *)
+let optionHelp (lst : chessPiece list) : Position list =
+   let pieces = List.map (fun (x : chessPiece) -> x.position) lst
+   let positions = (pieces |> List.choose id) // vælger elementer ud som "har et id", dvs er "Some p"
+   positions
+
+(*
  *  Det her er base klassen som begge nedarver fra.
  *  Den deklarerer en abstrakt funktion kaldet nextMove
  *  som andre klasser der nedarver fra denne klasse, er

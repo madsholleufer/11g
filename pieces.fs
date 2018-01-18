@@ -1,17 +1,6 @@
 module Pieces
 open Chess
 
-(*
- * Definerer en metode, der tager en liste af skakbrikker
- * som input og pakker hver briks position ud af dens 
- * option type. På denne måde får vi udtrukket brikkernes 
- * positionener.
- *)
-let optionHelp (lst : chessPiece list) : Position list =
-   let pieces = List.map (fun (x : chessPiece) -> x.position) lst
-   let positions = (pieces |> List.choose id) // vælger elementer ud som "har et id", dvs er "Some p"
-   positions
-
 /// A king is a chessPiece which moves 1 square in any direction
 type king(col : Color) =
   inherit chessPiece(col)

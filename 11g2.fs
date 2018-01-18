@@ -25,7 +25,7 @@ type Player(color : Color) =
     member this.getColor() = color
     // Hvis man har farven sort er man spiller 1 og så starter man,
     // ellers er man spiller 2 og har farven hvid.
-    member this.playerNumber = if this.color = Black then 1 else 2 //bruges til at vise hvis tur det er
+    member this.playerNumber : int = if this.color = Black then 1 else 2 //bruges til at vise hvis tur det er
     abstract member nextMove : Board -> string
 
 (*

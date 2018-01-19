@@ -41,6 +41,18 @@ type Human(color : Color) =
         // boolean flag der medvirker at den bliver ved med at spørge indtil der vælges en gyldig codestring
         let mutable invalidMove = true
         let mutable playerMove = ""
+
+        (*
+         * Tjekker om spilleren har brikker på brættet. 
+         * Hvis ja, så fortsætter vi, ellers har spilleren
+         * tabt og spillet afsluttes.
+         *)
+        // Henter spillerens brikker
+        let availablePieces = board.piecesOnBoard() |> List.filter (fun x -> (this.color = x.color))
+        if availablePieces.IsEmpty then
+            printfn "GAME OVER. YOU WIN!" //spilleren taber.
+            invalidMove <- false
+
         while (invalidMove) do
             printfn "\nSpiller %A du har farven: %A. \nHvor vil du rykke fra/til?" (this.playerNumber) (this.getColor())
             playerMove <- System.Console.ReadLine() //gemmer input
@@ -58,11 +70,6 @@ type Human(color : Color) =
                 let pieceToMove = (firstArg, secondArg)
                 //Putter destinatonsfeltet (targetSquare) i en tuppel
                 let targetSquare = (thirdArg, fourthArg)
-
-                //Tjekker om der er en af spillerens egne brikker på feltet pieceToMove
-                let availablePieces = board.piecesOnBoard() |> List.filter (fun x -> (this.color = x.color))
-                // Brikkernes positioner pakkes ud fra option type
-                let pos = optionHelp(availablePieces)
 
                 //Tjekker om targetSquare er et gyldigt træk.   
                 // Finder brikken, der skal flyttes. Vi bruger tryFind in case den indtastede brik ikke eksisterer.
@@ -83,6 +90,10 @@ type Human(color : Color) =
                     // Hvis pieceToMove matcher med en af brikkernes position OG hvis 
                     // targetSquare er et gyldigt træk for den givne brik, så er det 
                     // en gyldig codestring
+
+                    // Brikkernes positioner pakkes ud fra option type
+                    let pos = optionHelp(availablePieces)
+                    // Udfører tjekket
                     if (List.contains pieceToMove pos) && (targetSquareValid) then
                         invalidMove <- false
         playerMove
@@ -95,36 +106,44 @@ type Human(color : Color) =
 type Computer(color : Color) = 
     inherit Player(color)
     override this.nextMove (board : Board) =
-        //Henter alle egne brikker på brættet
-        let piecesList = board.piecesOnBoard() |> List.filter (fun x -> (this.color = x.color))
-        // Vælger en vilkårlig brik
-        // Genererer et tilfældigt tal
-        let gen = System.Random()
-        let x = gen.Next(0, piecesList.Length) // indtil sidste indeks i listen
-        let chosenPiece = piecesList.[x]
-        //bruger hjælpefunktionen til at pakke positionen ud fra option type. 
-        //funktionen returnerer en liste, så vi bruger indeksering til at udtrække positionen fra listen
-        let chosenCoors = optionHelp([chosenPiece]).[0]
-
-        // Finder brikkens mulige træk.
-        // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
-        // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
-        let positions = fst(chosenPiece.availableMoves(board)) //udtrækker positioner
-        let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker chessPieces
-        let chessPiecePos = optionHelp(chessPieces) //udpakker option type
-        let allPositions = List.append positions chessPiecePos //sætter positionerne og positionerne på chessPieces sammen i én liste
-        
-        //vælger vilkårligt en position
-        let randomIndex = gen.Next(0, allPositions.Length) // indtil sidste indeks i arrayet
-        let randomPos = allPositions.[randomIndex]
         //Laver codestring som en string
         let mutable codestring = ""
-        // Caster positionerne til strings
-        let a = (string) (fst(chosenCoors))
-        let b = (string) (snd(chosenCoors))
-        let c = (string) (fst(randomPos))
-        let d = (string) (snd(randomPos))
-        // tilføjer alle positioner til codestring
-        codestring <-String.concat "" [a; b; " "; c; d]
+        //Henter alle egne brikker på brættet
+        let piecesList = board.piecesOnBoard() |> List.filter (fun x -> (this.color = x.color))
+        //
+        if piecesList.IsEmpty then
+            printfn "GAME OVER. YOU WIN!" //spilleren vinder hvis computeren ikke har flere brikker tilbage
+            codestring <- "quit"
+        else
+            // Vælger en vilkårlig brik
+            // Genererer et tilfældigt tal
+            let gen = System.Random()
+            let x = gen.Next(0, piecesList.Length) // indtil sidste indeks i listen
+            let chosenPiece = piecesList.[x]
+            //bruger hjælpefunktionen til at pakke positionen ud fra option type. 
+            //funktionen returnerer en liste, så vi bruger indeksering til at udtrække positionen fra listen
+            let chosenCoors = optionHelp([chosenPiece]).[0]
+
+            // Finder brikkens mulige træk.
+            // Vi kan nemt udtrække listen med positioner, men vi skal også finde positionerne på 
+            // de brikker, der gives i chessPiece listen. Disse skal udpakkes fra deres option type.
+            let positions = fst(chosenPiece.availableMoves(board)) //udtrækker positioner
+            let chessPieces = snd(chosenPiece.availableMoves(board)) //udtrækker chessPieces
+            let chessPiecePos = optionHelp(chessPieces) //udpakker option type
+            let allPositions = List.append positions chessPiecePos //sætter positionerne og positionerne på chessPieces sammen i én liste
+            
+            if allPositions.IsEmpty then
+                codestring <- "quit" //spillet slutter hvis computeren ikke har flere ledige træk
+            else
+                //vælger vilkårligt en position
+                let randomIndex = gen.Next(0, allPositions.Length) // indtil sidste indeks i arrayet
+                let randomPos = allPositions.[randomIndex]
+                // Caster positionerne til strings
+                let a = (string) (fst(chosenCoors))
+                let b = (string) (snd(chosenCoors))
+                let c = (string) (fst(randomPos))
+                let d = (string) (snd(randomPos))
+                // tilføjer alle positioner til codestring
+                codestring <-String.concat "" [a; b; " "; c; d]
 
         codestring

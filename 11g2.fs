@@ -40,7 +40,7 @@ type Human(color : Color) =
     override this.nextMove(board : Board) =
         // boolean flag der medvirker at den bliver ved med at spørge indtil der vælges en gyldig codestring
         let mutable invalidMove = true
-        let mutable playerMove = ""
+        let mutable codestring = ""
 
         (*
          * Tjekker om spilleren har brikker på brættet. 
@@ -51,21 +51,22 @@ type Human(color : Color) =
         let availablePieces = board.piecesOnBoard() |> List.filter (fun x -> (this.color = x.color))
         if availablePieces.IsEmpty then
             printfn "GAME OVER. YOU WIN!" //spilleren taber.
+            codestring <- "quit"
             invalidMove <- false
-
+        //spilleren har brikker, så vi prompter for gyldigt input
         while (invalidMove) do
             printfn "\nSpiller %A du har farven: %A. \nHvor vil du rykke fra/til?" (this.playerNumber) (this.getColor())
-            playerMove <- System.Console.ReadLine() //gemmer input
-            if playerMove = "quit" then
+            codestring <- System.Console.ReadLine() //gemmer input
+            if codestring = "quit" then
                 invalidMove <- false //exit game/gyldigt input
             //Tjekker om input har korrekt længde og indeholder et mellemrum det rigtige sted
-            elif ((playerMove.Length) = 5) && ( (int) playerMove.[2] = 32) then 
+            elif ((codestring.Length) = 5) && ( (int) codestring.[2] = 32) then 
                 // Caster bogstaver til tal der passer til brættet. 
                 // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                let firstArg = (int) playerMove.[0] - 97 // char a = 97 decimal
-                let secondArg = (int) playerMove.[1] - 48 // char 0 = 48 decimal
-                let thirdArg = (int) playerMove.[3] - 97
-                let fourthArg = (int) playerMove.[4] - 48
+                let firstArg = (int) codestring.[0] - 97 // char a = 97 decimal
+                let secondArg = (int) codestring.[1] - 48 // char 0 = 48 decimal
+                let thirdArg = (int) codestring.[3] - 97
+                let fourthArg = (int) codestring.[4] - 48
                 //Putter brikken der skal flyttes i en tuppel
                 let pieceToMove = (firstArg, secondArg)
                 //Putter destinatonsfeltet (targetSquare) i en tuppel
@@ -96,7 +97,7 @@ type Human(color : Color) =
                     // Udfører tjekket
                     if (List.contains pieceToMove pos) && (targetSquareValid) then
                         invalidMove <- false
-        playerMove
+        codestring
 (*
  *  Dette er en af de nedarvede klasser, der laver en
  *  codestring tilfældigt. Den vælger en vilkårlig brik og

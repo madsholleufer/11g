@@ -66,25 +66,3 @@ let test3 = //human vs human
     // initialiserer spillet
     let spil = new Game(spiller1, spiller2)
     spil.run(board3, pieces3)
-
-// Laver et nyt spil til test 4
-let board4 = Chess.Board () // Create a board
-// Pieces are kept in an array for easy testing
-let pieces4 = [|
-  king (White) :> chessPiece;
-  rook (White) :> chessPiece;
-  king (Black) :> chessPiece;
-  rook (Black) :> chessPiece |]
-// Place pieces on the board
-board4.[0,0] <- Some pieces4.[0]
-board4.[3,1] <- Some pieces4.[1]
-board4.[4,1] <- Some pieces4.[2]
-board4.[7,1] <- Some pieces4.[3]
-
-let test4 = //human vs human
-    // initialiserer spillere
-    let spiller1 = new Human(Black)
-    let spiller2 = new Human(White)
-    // initialiserer spillet
-    let spil = new Game(spiller1, spiller2)
-    spil.run(board4, pieces4)

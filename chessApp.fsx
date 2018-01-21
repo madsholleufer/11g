@@ -37,7 +37,7 @@ while (gameinit) do
  * Pga. scope issues har vi først oprettet 
  * spillerne som mutable Players, som overskrives
  * til den givne spillertype inden i vores 
- * if-else statements.
+ * if-else statements. Dette kunne godt optimeres...
 *)
 let mutable spiller1 = new Player(Black)
 let mutable spiller2 = new Player(White)

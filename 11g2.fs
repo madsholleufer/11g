@@ -19,7 +19,6 @@ let optionHelp (lst : chessPiece list) : Position list =
  *  som andre klasser der nedarver fra denne klasse, er
  *  nødt til at implementere.
  *)
-[<AbstractClass>]
 type Player(color : Color) =
     member this.color = color // White, Black
     member this.getColor() = color
@@ -27,6 +26,8 @@ type Player(color : Color) =
     // ellers er man spiller 2 og har farven hvid.
     member this.playerNumber : int = if this.color = Black then 1 else 2 //bruges til at vise hvis tur det er
     abstract member nextMove : Board -> string
+    //Vi er nødt til at sætte en default, ellers kan vi ikke oprette instanser af klassen.
+    default this.nextMove (board : Board) = "quit"
 
 (*
  *  Dette er en af de nedarvede klasser, der spørger

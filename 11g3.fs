@@ -31,6 +31,32 @@ type Game(playerOne : Player, playerTwo : Player) =
         // Printer brættet
         board.printBoard board pieces
         while (gameplay) do
+               //Hvis spilleren er Computer
+            if (this.playerTwo :? Computer && codestring1 <> "quit") then
+                codestring2 <- this.playerTwo.nextMove(board)
+                if codestring2 = "quit" then
+                    printfn "---------------------------------------------------"
+                    printfn "Computeren kan ikke flytte sin brik. Du har vundet!"
+                    printfn "---------------------------------------------------"
+                    gameplay <- false
+                else
+                    // Konverterer codestring til en Position
+                    // Caster char tal til integers (der passer til brættet). 
+                    // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
+                    let firstArg = (int) codestring2.[0] - 48
+                    let secondArg = (int) codestring2.[1] - 48
+                    let thirdArg = (int) codestring2.[3] - 48
+                    let fourthArg = (int) codestring2.[4] - 48
+                    //Putter brikken der skal flyttes i en tuppel
+                    let source2 = (firstArg, secondArg)
+                    //Putter destinatonsfeltet (targetSquare) i en tuppel
+                    let target2 = (thirdArg, fourthArg)
+                    board.move source2 target2
+                    printfn "---------------------------------------------------"
+                    printfn "Computeren har flyttet sin brik..."
+                    printfn "---------------------------------------------------"
+                // Printer brættet
+                board.printBoard board pieces
             // Spiller 1s tur
             // Henter spillerens input og gemmer i codestring variablen
             codestring1 <- this.playerOne.nextMove(board)

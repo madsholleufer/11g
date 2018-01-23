@@ -31,10 +31,40 @@ type Game(playerOne : Player, playerTwo : Player) =
         // Printer brættet
         board.printBoard board pieces
         while (gameplay) do
-               //Hvis spilleren er Computer
-            if (this.playerTwo :? Computer && codestring1 <> "quit") then
-                codestring2 <- this.playerTwo.nextMove(board)
-                if codestring2 = "quit" then
+            // Spiller 1s tur
+            // Situationen hvor spiller 1 er Human:
+            if (this.playerOne :? Human && gameplay) then
+                // Henter spillerens input og gemmer i codestring variablen
+                codestring1 <- this.playerOne.nextMove(board)
+                // Vil spilleren stoppe med at spille?
+                if codestring1 = "quit" then
+                    printfn "---------------------------------------------------"
+                    printfn "GAME OVER. \nSpiller 1 har forladt spillet!"
+                    printfn "---------------------------------------------------"
+                    gameplay <- false
+                else 
+                    // Konverterer codestring til en Position
+                    // Caster char tal til integers (der passer til brættet). 
+                    // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
+                    let firstArg = (int) codestring1.[0] - 97
+                    let secondArg = (int) codestring1.[1] - 48
+                    let thirdArg = (int) codestring1.[3] - 97
+                    let fourthArg = (int) codestring1.[4] - 48
+                    //Putter brikken der skal flyttes i en tuppel
+                    let source = (firstArg, secondArg)
+                    //Putter destinatonsfeltet (targetSquare) i en tuppel
+                    let target = (thirdArg, fourthArg)
+                    //Flytter brikken
+                    board.move source target
+                    printfn "Spiller 1 har flyttet sin brik fra %A til %A.\n" source target
+                    // Printer brættet med den flyttede brik
+                    board.printBoard board pieces
+
+            // Situationen hvor spiller 1 er Computer:
+            elif (this.playerOne :? Computer) then
+                codestring1 <- this.playerOne.nextMove(board)
+                // Hvis computeren ikke har nogle ledige træk, returneres "quit" som codestring.
+                if codestring1 = "quit" then
                     printfn "---------------------------------------------------"
                     printfn "Computeren kan ikke flytte sin brik. Du har vundet!"
                     printfn "---------------------------------------------------"
@@ -43,49 +73,25 @@ type Game(playerOne : Player, playerTwo : Player) =
                     // Konverterer codestring til en Position
                     // Caster char tal til integers (der passer til brættet). 
                     // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                    let firstArg = (int) codestring2.[0] - 48
-                    let secondArg = (int) codestring2.[1] - 48
-                    let thirdArg = (int) codestring2.[3] - 48
-                    let fourthArg = (int) codestring2.[4] - 48
+                    let firstArg = (int) codestring1.[0] - 48
+                    let secondArg = (int) codestring1.[1] - 48
+                    let thirdArg = (int) codestring1.[3] - 48
+                    let fourthArg = (int) codestring1.[4] - 48
                     //Putter brikken der skal flyttes i en tuppel
-                    let source2 = (firstArg, secondArg)
+                    let source = (firstArg, secondArg)
                     //Putter destinatonsfeltet (targetSquare) i en tuppel
-                    let target2 = (thirdArg, fourthArg)
-                    board.move source2 target2
+                    let target = (thirdArg, fourthArg)
+                    //Flytter brikken
+                    board.move source target
                     printfn "---------------------------------------------------"
                     printfn "Computeren har flyttet sin brik..."
                     printfn "---------------------------------------------------"
                 // Printer brættet
                 board.printBoard board pieces
-            // Spiller 1s tur
-            // Henter spillerens input og gemmer i codestring variablen
-            codestring1 <- this.playerOne.nextMove(board)
-            // Vil spilleren stoppe med at spille?
-            if codestring1 = "quit" then
-                printfn "---------------------------------------------------"
-                printfn "GAME OVER. \nSpiller 1 har forladt spillet!"
-                printfn "---------------------------------------------------"
-                gameplay <- false
-            else 
-                // Konverterer codestring til en Position
-                // Caster char tal til integers (der passer til brættet). 
-                // Har brugt en ASCII tabel til at finde den tilsvarende talværdi
-                let firstArg = (int) codestring1.[0] - 97
-                let secondArg = (int) codestring1.[1] - 48
-                let thirdArg = (int) codestring1.[3] - 97
-                let fourthArg = (int) codestring1.[4] - 48
-                //Putter brikken der skal flyttes i en tuppel
-                let source = (firstArg, secondArg)
-                //Putter destinatonsfeltet (targetSquare) i en tuppel
-                let target = (thirdArg, fourthArg)
-                board.move source target
-                printfn "Spiller 1 har flyttet sin brik fra %A til %A.\n" source target
-                // Printer brættet med den flyttede brik
-                board.printBoard board pieces
 
             // Spiller 2s tur
             // Hvis spilleren er Human og den første spiller ikke har skrevet quit
-            if (this.playerTwo :? Human && codestring1 <> "quit" && gameplay) then
+            if (this.playerTwo :? Human && codestring1 <> "quit") then
                 codestring2 <- this.playerTwo.nextMove(board)
                 // Vil spilleren stoppe med at spille?
                 if codestring2 = "quit" then
@@ -105,12 +111,13 @@ type Game(playerOne : Player, playerTwo : Player) =
                     let source2 = (firstArg, secondArg)
                     //Putter destinatonsfeltet (targetSquare) i en tuppel
                     let target2 = (thirdArg, fourthArg)
+                    //Flytter brikken
                     board.move source2 target2
                     printfn "Spiller 2 har flyttet sin brik fra %A til %A.\n" source2 target2
                     // Printer brættet med den flyttede brik
                     board.printBoard board pieces
                     
-            //Hvis spilleren er Computer
+            //Hvis spiller 2 er en Computer
             elif (this.playerTwo :? Computer && codestring1 <> "quit") then
                 codestring2 <- this.playerTwo.nextMove(board)
                 if codestring2 = "quit" then
@@ -130,6 +137,7 @@ type Game(playerOne : Player, playerTwo : Player) =
                     let source2 = (firstArg, secondArg)
                     //Putter destinatonsfeltet (targetSquare) i en tuppel
                     let target2 = (thirdArg, fourthArg)
+                    //Flytter brikken
                     board.move source2 target2
                     printfn "---------------------------------------------------"
                     printfn "Computeren har flyttet sin brik..."
